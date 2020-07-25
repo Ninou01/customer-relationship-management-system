@@ -72,8 +72,8 @@
 						<td>{{order.product.category}}</td>
 						<td>{{order.date_created |date}}</td>
 						<td>{{order.status}}</td>
-						<td><a href=""><button class="btn btn-sm btn-info">Update</button></a></td>
-						<td><a href=""><button class="btn btn-sm btn-danger">Remove</button></a></td>
+						<td><a href="{% url 'accounts:update_order' order.pk %}"><button class="btn btn-sm btn-info">Update</button></a></td>
+						<td><a href="{% url 'accounts:delete_order' order.pk %}"><button class="btn btn-sm btn-danger">Remove</button></a></td>
 					</tr>
 				{% endfor %}
 			</table>
