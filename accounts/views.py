@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.forms import inlineformset_factory
 from .filters import OrderFilter
 from .models import Customer, Product, Order, Tag
-from .froms import OrderForm
+from .froms import OrderForm, CreateUserForm
 
 # Create your views here.
 
@@ -56,7 +58,7 @@ def create_order(request, pk):
         formset = OrderFormSet(request.POST, instance=customer)
         if formset.is_valid():
             formset.save()
-            return redirect('/dashboard')
+            return redirect('/customer/%s'%pk)
     else:
         formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
     context = {
@@ -90,3 +92,44 @@ def delete_order(request, pk):
     }
     return render(request, 'accounts/delete_order.html', context)
 
+
+def signup(request):
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+
+            user = form.cleaned_data.get('username')
+            messages.success(request, 'accout was created for ' + user)
+
+            return redirect('/dashboard')
+
+    else:
+        form = CreateUserForm()        
+
+    context = {
+        'form':form,
+    }
+    return render(request, 'accounts/signup.html', context)
+
+
+def loginuser(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/dashboard')
+
+    context = {}
+    return render(request, 'accounts/login.html', context)
+
+
+def logoutuser(request):
+    logout(request)
+    return redirect('/login')

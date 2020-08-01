@@ -2,6 +2,12 @@
 {% load static %}
 {% block content %}
 
+{% for message in messages %}
+	<div class="alert alert-success" role="alert">
+		<p class="success">{{message}}</p>
+	</div>
+{% endfor %}
+
 {% include 'accounts/status.html' %}
 
 <br>
