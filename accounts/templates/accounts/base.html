@@ -48,6 +48,12 @@
   {% endif %}
 </nav>
 
+{% for message in messages %}
+	<div class="alert alert-success" role="alert">
+		<p class="success">{{message}}</p>
+	</div>
+{% endfor %}
+
     {% block content %}
     
     {% endblock content %}

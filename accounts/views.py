@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.forms import inlineformset_factory
@@ -116,14 +117,19 @@ def signup(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_user = form.save()
+
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
 
-            user = form.cleaned_data.get('username')
-            messages.success(request, 'accout was created for ' + user)
+            group = Group.objects.get(name='customer')
+            new_user.groups.add(group)
+            Customer.objects.create(user=new_user, name=new_user.username)
+
+            username = form.cleaned_data.get('username')
+            messages.success(request, 'accout was created for ' + username)
 
             return redirect('/dashboard')
 
@@ -156,8 +162,19 @@ def logoutuser(request):
 
 
 @login_required(login_url='/login/')
+@allowed_users(['customer'])
 def user_page(request):
-    return render(request, 'accounts/user-page.html')
+    orders = request.user.customer.order_set.all()
+    delivered = request.user.customer.order_set.filter(status='Delivered')
+    pending = request.user.customer.order_set.filter(status='Pending')
+
+    context = {
+        'orders':orders,
+        'delivered':delivered,
+        'pending':pending,
+    }
+
+    return render(request, 'accounts/user-page.html', context)
 
 # if you want to use a customize 404 page
 # set DEBUG = False and ALLOWED_HOSTS = ['localhost'] in setings.py
