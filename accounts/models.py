@@ -9,6 +9,7 @@ class Customer(models.Model):
     name = models.CharField(max_length=200, blank=True)
     phone = models.CharField(max_length=200, blank=True)
     email = models.EmailField(max_length=200, blank=True)
+    profile_pic = models.ImageField(blank=True, null=True, upload_to='profile_pic/')
     date_crated = models.DateTimeField(default=datetime.datetime.now(), blank=True)
 
     def __str__(self):

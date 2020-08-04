@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.forms import inlineformset_factory
 from .filters import OrderFilter
 from .models import Customer, Product, Order, Tag
-from .froms import OrderForm, CreateUserForm
+from .froms import OrderForm, CreateUserForm, CustomerForm
 from .decorators import unauthenticated_user, allowed_users, adminonly
 
 # Create your views here.
@@ -175,6 +175,22 @@ def user_page(request):
     }
 
     return render(request, 'accounts/user-page.html', context)
+
+
+@login_required(login_url='/login/')
+@allowed_users(['customer'])
+def accountSettings(request):
+    user = request.user.customer
+    form = CustomerForm(instance=user)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, request.FILES, instance=user)
+        form.save()
+        return redirect('/user-page/')
+    context = {
+        'form':form,
+    }
+    return render(request, 'accounts/accountSettings.html', context)
+
 
 # if you want to use a customize 404 page
 # set DEBUG = False and ALLOWED_HOSTS = ['localhost'] in setings.py
