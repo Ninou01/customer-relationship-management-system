@@ -1,0 +1,25 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-7">
+		<div class="card card-body">
+
+            <form  method="post">
+                {% csrf_token %}
+                {{formset.management_form}}
+                {% for form in formset %}
+                    {{form}}
+                    <hr>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary" >Submit</button>
+                <a class="btn btn-warning" href="" onclick="javascript:window.history.back(-1);return false;">cancel</a>
+            </form>
+ 
+        </div>
+    </div>
+</div>
+{% endblock %}
