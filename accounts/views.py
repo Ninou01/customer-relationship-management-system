@@ -117,17 +117,11 @@ def signup(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
-            new_user = form.save()
-
+            form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-
-            group = Group.objects.get(name='customer')
-            new_user.groups.add(group)
-            Customer.objects.create(user=new_user, name=new_user.username)
-
             username = form.cleaned_data.get('username')
             messages.success(request, 'accout was created for ' + username)
 
